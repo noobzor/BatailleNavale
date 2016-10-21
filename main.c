@@ -16,7 +16,7 @@ const int BATEAU[NB_BATEAU] = { 5, 4, 3, 3, 2};
 #define CHERCHE_POSY_INI 2
 #define CHERCHE_POSX_ACTU 3
 #define CHERCHE_POSY_ACTU 4
-
+//bonjour
 
 void waitFor (unsigned int secs)
 {
