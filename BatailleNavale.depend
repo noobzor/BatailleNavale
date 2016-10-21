@@ -1,0 +1,10 @@
+# depslib dependency file v1.0
+1476449564 source:c:\users\fabien\documents\c\bataillenavale\main.c
+	<stdio.h>
+	<stdlib.h>
+
+1476892660 source:c:\users\fabien\documents\it_start\c\bataillenavale\main.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+
