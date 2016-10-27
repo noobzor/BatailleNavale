@@ -16,7 +16,6 @@ const int BATEAU[NB_BATEAU] = { 5, 4, 3, 3, 2};
 #define CHERCHE_POSY_INI 2
 #define CHERCHE_POSX_ACTU 3
 #define CHERCHE_POSY_ACTU 4
-//bonjour
 
 void waitFor (unsigned int secs)
 {
@@ -58,28 +57,7 @@ void GenereMap(int tailleX,  int tailleY, int map[MAP_PAR_JOUEUR][tailleX][taill
     }
 }
 
-void affichemap(int tailleX,  int tailleY, int map[MAP_PAR_JOUEUR][tailleX][tailleY])
-{
-    int i;
-    int j;
-    int k;
-
-    for (i = 0; i < 2; i++)
-        {
-            for (j = 0; j < tailleX; j++)
-            {
-                for (k = 0; k < tailleY; k++)
-                {
-                    printf("%c ", (char)map[i][j][k]);
-                }
-                 printf("\n");
-            }
-             printf("\n\n");
-        }
-        printf("\n");
-}
-
-void affichecontrole(int tailleX,  int tailleY, int mapA[MAP_PAR_JOUEUR][tailleX][tailleY], int mapB[MAP_PAR_JOUEUR][tailleX][tailleY])
+void affichemap(int tailleX,  int tailleY, int mapA[MAP_PAR_JOUEUR][tailleX][tailleY], int mapB[MAP_PAR_JOUEUR][tailleX][tailleY])
 {
     int j;
     int k;
@@ -95,7 +73,7 @@ void affichecontrole(int tailleX,  int tailleY, int mapA[MAP_PAR_JOUEUR][tailleX
 
                 for (k = 0; k < tailleY; k++)
                 {
-                    printf("%c ", (char)mapB[MAP_PLACE][j][k]);
+                    printf("%c ", (char)mapA[MAP_PLACE][j][k]);
                 }
                  printf("\n");
             }
@@ -251,7 +229,7 @@ void placebateau_joueur(int tailleX, int tailleY, int map[MAP_PAR_JOUEUR][taille
 
             do
             {
-                printf("choisir taille verticale (entre 1 et %d): ", tailleX);
+                printf("choisir position verticale (entre 1 et %d): ", tailleX);
                 scanf("%d", &xB);
                 xB--;
                 fflush(stdin);
@@ -260,7 +238,7 @@ void placebateau_joueur(int tailleX, int tailleY, int map[MAP_PAR_JOUEUR][taille
 
             do
             {
-                printf("choisir taille horizontale (entre 1 et %d): ", tailleY);
+                printf("choisir position horizontale (entre 1 et %d): ", tailleY);
                 scanf("%d", &yB);
                 yB--;
                 fflush(stdin);
@@ -298,10 +276,11 @@ void placebateau_joueur(int tailleX, int tailleY, int map[MAP_PAR_JOUEUR][taille
     }
 }
 
-void attaque(int* xB, int* yB, int cherche[5], int* pv, int tailleX,  int tailleY, int mapA[MAP_PAR_JOUEUR][tailleX][tailleY], int mapB[MAP_PAR_JOUEUR][tailleX][tailleY])
+void attaque(int cherche[5], int* pv, int tailleX,  int tailleY, int mapA[MAP_PAR_JOUEUR][tailleX][tailleY], int mapB[MAP_PAR_JOUEUR][tailleX][tailleY])
 {
-
-   int joue = 0;
+    int xB = 0;
+    int yB = 0;
+    int joue = 0;
 
     while(joue == 0)
     {
@@ -311,33 +290,30 @@ void attaque(int* xB, int* yB, int cherche[5], int* pv, int tailleX,  int taille
             case 0:
                 do
                 {
-                    *xB = doRand(0, tailleX + 1);
-                    *yB = doRand(0, tailleY + 1);
+                    xB = doRand(0, tailleX + 1);
+                    yB = doRand(0, tailleY + 1);
                 }
-                while(mapA[MAP_TIR][*xB][*yB] == MAP_TOUCHE || mapA[MAP_TIR][*xB][*yB] == MAP_RATE);
+                while(mapA[MAP_TIR][xB][yB] == MAP_TOUCHE || mapA[MAP_TIR][xB][yB] == MAP_RATE);
 
-               affichecontrole(tailleX, tailleY, mapA, mapB);
-
-                if(mapB[MAP_PLACE][*xB][*yB] == MAP_VIDE)
+                if(mapB[MAP_PLACE][xB][yB] == MAP_VIDE)
                 {
-                    mapA[MAP_TIR][*xB][*yB] = MAP_RATE;
+                    mapA[MAP_TIR][xB][yB] = MAP_RATE;
+                    printf("rate\n");
                 }
                 else
                 {
-                    mapA[MAP_TIR][*xB][*yB] = MAP_TOUCHE;
+                    mapA[MAP_TIR][xB][yB] = MAP_TOUCHE;
                     *pv = *pv - 1;
                     printf("touche\n");
-                    printf("%d\n", *pv);
                     cherche[CHERCHE_TYPE] = 1;
-                    cherche[CHERCHE_POSX_INI] = *xB;
-                    cherche[CHERCHE_POSY_INI] = *yB;
-                    cherche[CHERCHE_POSX_ACTU] = *xB;
-                    cherche[CHERCHE_POSY_ACTU] = *yB;
+                    cherche[CHERCHE_POSX_INI] = xB;
+                    cherche[CHERCHE_POSY_INI] = yB;
+                    cherche[CHERCHE_POSX_ACTU] = xB;
+                    cherche[CHERCHE_POSY_ACTU] = yB;
                 }
                 break;
 
             case 1:
-                printf("cas1\n");
                 if (cherche[CHERCHE_POSX_ACTU] + 1 > tailleX -1 ||  mapA[MAP_TIR][cherche[CHERCHE_POSX_ACTU] + 1][cherche[CHERCHE_POSY_INI]] != MAP_VIDE)
                 {
                      joue = 0;
@@ -356,13 +332,10 @@ void attaque(int* xB, int* yB, int cherche[5], int* pv, int tailleX,  int taille
                     *pv = *pv - 1;
                     cherche[CHERCHE_POSX_ACTU] = cherche[CHERCHE_POSX_ACTU] + 1;
                     printf("touche\n");
-                    printf("%d\n", *pv);
-
                 }
                 break;
 
             case 2:
-                printf("cas2\n");
                 if (cherche[CHERCHE_POSX_ACTU] - 1 < 0 ||  mapA[MAP_TIR][cherche[CHERCHE_POSX_ACTU] - 1 ][cherche[CHERCHE_POSY_INI]] != MAP_VIDE)
                 {
                      joue = 0;
@@ -381,12 +354,10 @@ void attaque(int* xB, int* yB, int cherche[5], int* pv, int tailleX,  int taille
                     *pv = *pv - 1;
                     cherche[CHERCHE_POSX_ACTU] = cherche[CHERCHE_POSX_ACTU] - 1;
                     printf("touche\n");
-                    printf("%d\n", *pv);
                 }
                 break;
 
             case 3:
-                printf("cas3\n");
                 if (cherche[CHERCHE_POSY_ACTU]  + 1 > tailleY - 1 ||  mapA[MAP_TIR][cherche[CHERCHE_POSX_INI]][cherche[CHERCHE_POSY_ACTU] + 1] != MAP_VIDE)
                 {
                      joue = 0;
@@ -405,11 +376,9 @@ void attaque(int* xB, int* yB, int cherche[5], int* pv, int tailleX,  int taille
                     *pv = *pv - 1;
                     cherche[CHERCHE_POSY_ACTU] = cherche[CHERCHE_POSY_ACTU] + 1;
                     printf("touche\n");
-                    printf("%d\n", *pv);
                 }
                 break;
             case 4:
-                printf("cas4\n");
                 if (cherche[CHERCHE_POSY_ACTU]  - 1 < 0 ||  mapA[MAP_TIR][cherche[CHERCHE_POSX_INI]][cherche[CHERCHE_POSY_ACTU] - 1] != MAP_VIDE)
                 {
                      joue = 0;
@@ -428,14 +397,12 @@ void attaque(int* xB, int* yB, int cherche[5], int* pv, int tailleX,  int taille
                     *pv = *pv - 1;
                     cherche[CHERCHE_POSY_ACTU] = cherche[CHERCHE_POSY_ACTU] - 1;
                     printf("touche\n");
-                    printf("%d\n", *pv);
                 }
                 break;
         }
     }
-   // printf("x:%d y:%d\n", *xB, *yB);
-    printf("x:%d y:%d\n", cherche[3],cherche[4]);
-    affichecontrole(tailleX, tailleY, mapA, mapB);
+    printf("en x:%d y:%d\n", cherche[CHERCHE_POSX_ACTU],cherche[CHERCHE_POSY_ACTU]);
+    printf("%d", *pv);
 }
 
 void attaque_joueur(int* pv, int tailleX,  int tailleY, int mapA[MAP_PAR_JOUEUR][tailleX][tailleY], int mapB[MAP_PAR_JOUEUR][tailleX][tailleY])
@@ -454,7 +421,7 @@ void attaque_joueur(int* pv, int tailleX,  int tailleY, int mapA[MAP_PAR_JOUEUR]
             xB--;
             fflush(stdin);
         }
-        while (xB < 0 && xB > tailleX);
+        while (xB < 0 || xB > tailleX);
 
         do
         {
@@ -463,7 +430,7 @@ void attaque_joueur(int* pv, int tailleX,  int tailleY, int mapA[MAP_PAR_JOUEUR]
             yB--;
             fflush(stdin);
         }
-        while (yB < 0 && yB > tailleY);
+        while (yB < 0 || yB > tailleY);
 
         if (mapA[MAP_TIR][xB][yB] != MAP_VIDE)
         {
@@ -473,19 +440,17 @@ void attaque_joueur(int* pv, int tailleX,  int tailleY, int mapA[MAP_PAR_JOUEUR]
     while (mapA[MAP_TIR][xB][yB] != MAP_VIDE);
 
 
-    if (mapB[MAP_PLACE][xB][yB] =! MAP_VIDE)
+    if (mapB[MAP_PLACE][xB][yB] == MAP_VIDE)
     {
-        mapA[MAP_TIR][xB][yB] = MAP_TOUCHE;
-        *pv = *pv - 1;
-        printf("TOUCHE");
+        mapA[MAP_TIR][xB][yB] = MAP_RATE;
+        printf("RATE\n");
     }
     else
     {
-        mapA[MAP_TIR][xB][yB] = MAP_RATE;
-        printf("RATE");
+       mapA[MAP_TIR][xB][yB] = MAP_TOUCHE;
+        *pv = *pv - 1;
+        printf("TOUCHE\n");
     }
-
-    affichecontrole(tailleX, tailleY, mapA, mapB);
 }
 
 void victoire(int pvJ1, int pvJ2)
@@ -499,6 +464,68 @@ void victoire(int pvJ1, int pvJ2)
         printf("J2 a gagner\n\n");
     }
 }
+void FilerWrite(int tailleX, int tailleY, int pvA, int pvB, int mapA[MAP_PAR_JOUEUR][tailleX][tailleY], int mapB[MAP_PAR_JOUEUR][tailleX][tailleY])
+{
+    int i = 0;
+    int j = 0;
+    int k = 0;
+    int l = 0;
+
+    FILE* ftp = fopen("./sauvegarde.txt","w");
+
+    fprintf(ftp,"%c\n",(char)tailleX);
+    fprintf(ftp,"%c\n",(char)tailleY);
+    fprintf(ftp,"%c\n",(char)pvA);
+    fprintf(ftp,"%c\n",(char)pvB);
+
+    for (i = 0; i < 2; i++)
+    {
+        for (j = 0; j < 2; j++)
+        {
+            for (k = 0; k < tailleX; k++)
+            {
+                for (l = 0; l < tailleY; l++)
+                {
+                    if (i == 0)
+                    {
+                        fprintf(ftp,"%c\n",(char)mapA[j][k][l]);
+                    }
+                    else
+                    {
+                        fprintf(ftp,"%c\n",(char)mapB[j][k][l]);
+                    }
+                }
+            }
+        }
+    }
+
+    fclose(ftp);
+}
+
+void FilerRead(int* pointeur_tailleX, int* pointeur_tailleY)
+{
+    FILE* fptr = fopen("./sauvegarde.txt","r");
+    char c;
+
+    c = fgetc(fptr);
+    *pointeur_tailleX = (int)c;
+    c = fgetc(fptr);
+    *pointeur_tailleY = (int)c;
+
+    int mapJ1[MAP_PAR_JOUEUR][*pointeur_tailleX][*pointeur_tailleY];
+    int mapJ2[MAP_PAR_JOUEUR][*pointeur_tailleX][*pointeur_tailleY];
+
+    while(1)
+    {
+        c = fgetc(fptr);
+        if ( feof(fptr) )
+        {
+            break;
+        }
+        printf ("%c", c);
+    }
+    fclose(fptr);
+}
 
 int main()
 {
@@ -508,76 +535,158 @@ int main()
     int tailleY = 0;
     int chercheJ1[5] = {0};
     int chercheJ2[5] = {0};
-    int x1B = 0;
-    int x2B = 0;
-    int y1B = 0;
-    int y2B = 0;
-    int nb_joueur = 0;
+    int nb_joueur = 1;
+    int partie = 0;
+    char c;
+    int i = 0;
+    int j = 0;
+    int k = 0;
+    int l = 0;
+
 
     do
     {
-        printf("choisir nombre de joueur: ");
-        scanf("%d", &nb_joueur);
+        printf("choisir\nNouvelle partie[0]\nCharger partie[1]\n");
+        scanf("%d", &partie);
         fflush(stdin);
     }
     while (nb_joueur != 0 && nb_joueur != 1);
 
-    do
+    if (partie == 0)
     {
-        printf("choisir taille verticale (entre 6 et 99): ");
-        scanf("%d", &tailleX);
-        fflush(stdin);
-    }
-    while (tailleX < 6 || tailleX > 99);
+        do
+        {
+            printf("choisir nombre de joueur(0 ou 1): ");
+            scanf("%d", &nb_joueur);
+            fflush(stdin);
+        }
+        while (nb_joueur != 0 && nb_joueur != 1);
 
-    do
-    {
-        printf("choisir taille horizontale (entre 6 et 99): ");
-        scanf("%d", &tailleY);
-        fflush(stdin);
-    }
-    while (tailleY < 6 || tailleY > 99);
+        do
+        {
+            printf("choisir taille verticale (entre 6 et 99): ");
+            scanf("%d", &tailleX);
+            fflush(stdin);
+        }
+        while (tailleX < 6 || tailleX > 99);
 
-    int mapJ1[MAP_PAR_JOUEUR][tailleX][tailleY];
-    int mapJ2[MAP_PAR_JOUEUR][tailleX][tailleY];
+        do
+        {
+            printf("choisir taille horizontale (entre 6 et 99): ");
+            scanf("%d", &tailleY);
+            fflush(stdin);
+        }
+        while (tailleY < 6 || tailleY > 99);
 
-    GenereMap(tailleX, tailleY, mapJ1);
-    GenereMap(tailleX, tailleY, mapJ2);
-
-    if (nb_joueur == 0)
-    {
-        placeBateau(tailleX, tailleY, mapJ1);
     }
     else
     {
-        placebateau_joueur(tailleX, tailleY, mapJ1);
+        FILE* fptr = fopen("./sauvegarde.txt","r");
+
+        c = fgetc(fptr);
+        tailleX = (int)c;
+        c = fgetc(fptr);
+        tailleY = (int)c;
+        c = fgetc(fptr);
+        pvJ1 = (int)c;
+        c = fgetc(fptr);
+        pvJ2 = (int)c;
+
+        fclose(fptr);
+
     }
+
+        int mapJ1[MAP_PAR_JOUEUR][tailleX][tailleY];
+        int mapJ2[MAP_PAR_JOUEUR][tailleX][tailleY];
+
+    if (partie == 0)
+    {
+        GenereMap(tailleX, tailleY, mapJ1);
+        GenereMap(tailleX, tailleY, mapJ2);
+
+        if (nb_joueur == 0)
+        {
+            placeBateau(tailleX, tailleY, mapJ1);
+        }
+        else
+        {
+            placebateau_joueur(tailleX, tailleY, mapJ1);
+        }
 
     placeBateau(tailleX, tailleY, mapJ2);
 
+    }
+    else
+    {
+        FILE* fptr = fopen("./sauvegarde.txt","r");
 
+        if(fptr == NULL)
+        {
+        perror("Erreur aucun fichier de sauvegarde");
+        return(-1);
+        }
+
+        c = fgetc(fptr);
+        c = fgetc(fptr);
+        c = fgetc(fptr);
+        c = fgetc(fptr);
+
+    for (i = 0; i < 2; i++)
+    {
+        for (j = 0; j < 2; j++)
+        {
+            for (k = 0; k < tailleX; k++)
+            {
+                for (l = 0; l < tailleY; l++)
+                {
+                    if (i == 0)
+                    {
+                        c = fgetc(fptr);
+                        if (c != '\n')
+                        mapJ1[j][k][l] = (int)c;
+                    }
+                    else
+                    {
+                        c = fgetc(fptr);
+                        mapJ2[j][k][l] = (int)c;
+                    }
+                }
+            }
+        }
+    }
+
+
+
+        fclose(fptr);
+    }
 
     do
     {
         if (nb_joueur == 0)
         {
-            printf("J1 attaque J2 en :\n");
-            attaque(&x1B, &y1B, chercheJ1, &pvJ2, tailleX, tailleY, mapJ1, mapJ2);
+            printf("J1 attaque J2\n");
+            attaque(chercheJ1, &pvJ2, tailleX, tailleY, mapJ1, mapJ2);
+            printf("pv restant a J2\n");
         }
         else
         {
             attaque_joueur(&pvJ2, tailleX, tailleY, mapJ1, mapJ2);
         }
 
-        printf("J2 attaque J1 en :\n");
-        attaque(&x2B, &y2B, chercheJ2, &pvJ1, tailleX, tailleY, mapJ2, mapJ1);
+        printf("\n");
+        printf("J2 attaque J1\n");
+        attaque(chercheJ2, &pvJ1, tailleX, tailleY, mapJ2, mapJ1);
+        printf("pv restant a J1\n");
+        printf("\n");
+
+        FilerWrite(tailleX, tailleY, pvJ1, pvJ2, mapJ1, mapJ2);
     }
     while(pvJ1 > 0 && pvJ2 > 0);
 
     printf("Joueur1:\n");
-    affichemap(tailleX, tailleY, mapJ1);
+    affichemap(tailleX, tailleY, mapJ1, mapJ2);
     printf("Joueur2:\n");
-    affichemap(tailleX, tailleY, mapJ2);
+    affichemap(tailleX, tailleY, mapJ2, mapJ1);
 
     victoire(pvJ1,pvJ2);
 
