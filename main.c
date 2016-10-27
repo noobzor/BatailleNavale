@@ -498,33 +498,7 @@ void FilerWrite(int tailleX, int tailleY, int pvA, int pvB, int mapA[MAP_PAR_JOU
             }
         }
     }
-
     fclose(ftp);
-}
-
-void FilerRead(int* pointeur_tailleX, int* pointeur_tailleY)
-{
-    FILE* fptr = fopen("./sauvegarde.txt","r");
-    char c;
-
-    c = fgetc(fptr);
-    *pointeur_tailleX = (int)c;
-    c = fgetc(fptr);
-    *pointeur_tailleY = (int)c;
-
-    int mapJ1[MAP_PAR_JOUEUR][*pointeur_tailleX][*pointeur_tailleY];
-    int mapJ2[MAP_PAR_JOUEUR][*pointeur_tailleX][*pointeur_tailleY];
-
-    while(1)
-    {
-        c = fgetc(fptr);
-        if ( feof(fptr) )
-        {
-            break;
-        }
-        printf ("%c", c);
-    }
-    fclose(fptr);
 }
 
 int main()
@@ -586,9 +560,12 @@ int main()
         c = fgetc(fptr);
         tailleX = (int)c;
         c = fgetc(fptr);
+        c = fgetc(fptr);
         tailleY = (int)c;
         c = fgetc(fptr);
+        c = fgetc(fptr);
         pvJ1 = (int)c;
+        c = fgetc(fptr);
         c = fgetc(fptr);
         pvJ2 = (int)c;
 
@@ -626,36 +603,35 @@ int main()
         return(-1);
         }
 
-        c = fgetc(fptr);
-        c = fgetc(fptr);
-        c = fgetc(fptr);
-        c = fgetc(fptr);
-
-    for (i = 0; i < 2; i++)
-    {
-        for (j = 0; j < 2; j++)
+        for(i = 0; i < 8; i++)
         {
-            for (k = 0; k < tailleX; k++)
+            c = fgetc(fptr);
+        }
+
+        for (i = 0; i < 2; i++)
+        {
+            for (j = 0; j < 2; j++)
             {
-                for (l = 0; l < tailleY; l++)
+                for (k = 0; k < tailleX; k++)
                 {
-                    if (i == 0)
+                    for (l = 0; l < tailleY; l++)
                     {
-                        c = fgetc(fptr);
-                        if (c != '\n')
-                        mapJ1[j][k][l] = (int)c;
-                    }
-                    else
-                    {
-                        c = fgetc(fptr);
-                        mapJ2[j][k][l] = (int)c;
+                        if (i == 0)
+                        {
+                            c = fgetc(fptr);
+                            mapJ1[j][k][l] = (int)c;
+                            c = fgetc(fptr);
+                        }
+                        else
+                        {
+                            c = fgetc(fptr);
+                            mapJ2[j][k][l] = (int)c;
+                            c = fgetc(fptr);
+                        }
                     }
                 }
             }
         }
-    }
-
-
 
         fclose(fptr);
     }
@@ -671,6 +647,8 @@ int main()
         else
         {
             attaque_joueur(&pvJ2, tailleX, tailleY, mapJ1, mapJ2);
+            printf("pv restant a J2\n");
+
         }
 
         printf("\n");
