@@ -103,10 +103,12 @@ void affichecontrole(int tailleX,  int tailleY, int mapA[MAP_PAR_JOUEUR][tailleX
 
 }
 
-void affichemapjoueur(int tailleX,  int tailleY, int map[MAP_PAR_JOUEUR][tailleX][tailleY])
+void affichemapjoueur(int tailleX, int tailleY,int choixmap, int map[MAP_PAR_JOUEUR][tailleX][tailleY])
 {
    int j = 0;
    int k = 0;
+   int a = 0;
+   int b = 0;
 
     for (j = -1; j < tailleX; j++)
     {
@@ -114,15 +116,43 @@ void affichemapjoueur(int tailleX,  int tailleY, int map[MAP_PAR_JOUEUR][tailleX
         {
             if (j == -1 && k == -1)
             {
-                printf("%c ", '/');
+                printf(" /");
             }
             else if(j == -1)
             {
-                printf("%c ", (char)k+1+48);
+                a = (k + 48 - 57)/10;
+                b = (k + 1)%10;
+
+                if(k+1+48 > 57)
+                {
+                    printf("%c", (char)a + 48 + 1);
+                }
+                else
+                {
+                    printf(" ");
+                }
+                printf("%c", (char)b + 48);
+            }
+            else if (k == -1)
+            {
+                a = (j + 48 - 57)/10;
+                b = (j + 1)%10;
+
+                if(j+1+48 > 57)
+                {
+                    printf("%c", (char)a + 48 + 1);
+
+                }
+                else
+                {
+                    printf(" ");
+                }
+                printf("%c", (char)b + 48);
+                printf(" ");
             }
             else
             {
-                printf("%c ", (char)map[MAP_PLACE][j][k]);
+                printf("%c ", (char)map[choixmap][j][k]);
             }
         }
         printf("\n");
@@ -210,7 +240,7 @@ void placebateau_joueur(int tailleX, int tailleY, int map[MAP_PAR_JOUEUR][taille
     {
         do
         {
-            affichemapjoueur(tailleX, tailleY, map);
+            affichemapjoueur(tailleX, tailleY, MAP_PLACE, map);
             valide = 1;
             switch(i + 1)
             {
@@ -221,16 +251,18 @@ void placebateau_joueur(int tailleX, int tailleY, int map[MAP_PAR_JOUEUR][taille
 
             do
             {
-                printf("choisir taille verticale (entre 0 et %d): ", tailleX);
+                printf("choisir taille verticale (entre 1 et %d): ", tailleX);
                 scanf("%d", &xB);
+                xB--;
                 fflush(stdin);
             }
             while (xB < 0 &&xB > tailleX);
 
             do
             {
-                printf("choisir taille horizontale (entre 0 et %d): ", tailleY);
+                printf("choisir taille horizontale (entre 1 et %d): ", tailleY);
                 scanf("%d", &yB);
+                yB--;
                 fflush(stdin);
             }
             while (yB < 0 && yB > tailleY);
@@ -406,9 +438,54 @@ void attaque(int* xB, int* yB, int cherche[5], int* pv, int tailleX,  int taille
     affichecontrole(tailleX, tailleY, mapA, mapB);
 }
 
-void attaque_joueur(int* xB, int* yB, int cherche[5], int* pv, int tailleX,  int tailleY, int mapA[MAP_PAR_JOUEUR][tailleX][tailleY], int mapB[MAP_PAR_JOUEUR][tailleX][tailleY])
+void attaque_joueur(int* pv, int tailleX,  int tailleY, int mapA[MAP_PAR_JOUEUR][tailleX][tailleY], int mapB[MAP_PAR_JOUEUR][tailleX][tailleY])
 {
+    int xB = 0;
+    int yB = 0;
 
+    affichemapjoueur(tailleX, tailleY, MAP_TIR, mapA);
+
+    do
+    {
+        do
+        {
+            printf("choisir attaque verticale (entre 1 et %d): ", tailleX);
+            scanf("%d", &xB);
+            xB--;
+            fflush(stdin);
+        }
+        while (xB < 0 && xB > tailleX);
+
+        do
+        {
+            printf("choisir attaque horizontale (entre 1 et %d): ", tailleY);
+            scanf("%d", &yB);
+            yB--;
+            fflush(stdin);
+        }
+        while (yB < 0 && yB > tailleY);
+
+        if (mapA[MAP_TIR][xB][yB] != MAP_VIDE)
+        {
+            printf("deja fait, reessayer\n");
+        }
+    }
+    while (mapA[MAP_TIR][xB][yB] != MAP_VIDE);
+
+
+    if (mapB[MAP_PLACE][xB][yB] =! MAP_VIDE)
+    {
+        mapA[MAP_TIR][xB][yB] = MAP_TOUCHE;
+        *pv = *pv - 1;
+        printf("TOUCHE");
+    }
+    else
+    {
+        mapA[MAP_TIR][xB][yB] = MAP_RATE;
+        printf("RATE");
+    }
+
+    affichecontrole(tailleX, tailleY, mapA, mapB);
 }
 
 void victoire(int pvJ1, int pvJ2)
@@ -464,7 +541,6 @@ int main()
     int mapJ1[MAP_PAR_JOUEUR][tailleX][tailleY];
     int mapJ2[MAP_PAR_JOUEUR][tailleX][tailleY];
 
-
     GenereMap(tailleX, tailleY, mapJ1);
     GenereMap(tailleX, tailleY, mapJ2);
 
@@ -490,7 +566,7 @@ int main()
         }
         else
         {
-            attaque_joueur(&x1B, &y1B, chercheJ1, &pvJ2, tailleX, tailleY, mapJ1, mapJ2);
+            attaque_joueur(&pvJ2, tailleX, tailleY, mapJ1, mapJ2);
         }
 
         printf("J2 attaque J1 en :\n");
