@@ -276,6 +276,33 @@ void placebateau_joueur(int tailleX, int tailleY, int map[MAP_PAR_JOUEUR][taille
     }
 }
 
+void attaque_facile(int* pv, int tailleX,  int tailleY, int mapA[MAP_PAR_JOUEUR][tailleX][tailleY], int mapB[MAP_PAR_JOUEUR][tailleX][tailleY])
+{
+    int xB = 0;
+    int yB = 0;
+
+    do
+    {
+        xB = doRand(0, tailleX + 1);
+        yB = doRand(0, tailleY + 1);
+    }
+    while(mapA[MAP_TIR][xB][yB] == MAP_TOUCHE || mapA[MAP_TIR][xB][yB] == MAP_RATE);
+
+    if(mapB[MAP_PLACE][xB][yB] == MAP_VIDE)
+    {
+        mapA[MAP_TIR][xB][yB] = MAP_RATE;
+        printf("rate\n");
+    }
+    else
+    {
+        mapA[MAP_TIR][xB][yB] = MAP_TOUCHE;
+        *pv = *pv - 1;
+        printf("touche\n");
+    }
+    printf("en x:%d y:%d\n", xB, yB);
+    printf("%d", *pv);
+}
+
 void attaque(int cherche[5], int* pv, int tailleX,  int tailleY, int mapA[MAP_PAR_JOUEUR][tailleX][tailleY], int mapB[MAP_PAR_JOUEUR][tailleX][tailleY])
 {
     int xB = 0;
@@ -464,7 +491,7 @@ void victoire(int pvJ1, int pvJ2)
         printf("J2 a gagner\n\n");
     }
 }
-void FilerWrite(int tailleX, int tailleY, int pvA, int pvB, int mapA[MAP_PAR_JOUEUR][tailleX][tailleY], int mapB[MAP_PAR_JOUEUR][tailleX][tailleY])
+void FilerWrite(int difficulte, int tailleX, int tailleY, int pvA, int pvB, int mapA[MAP_PAR_JOUEUR][tailleX][tailleY], int mapB[MAP_PAR_JOUEUR][tailleX][tailleY])
 {
     int i = 0;
     int j = 0;
@@ -473,6 +500,7 @@ void FilerWrite(int tailleX, int tailleY, int pvA, int pvB, int mapA[MAP_PAR_JOU
 
     FILE* ftp = fopen("./sauvegarde.txt","w");
 
+    fprintf(ftp,"%c\n",(char)difficulte);
     fprintf(ftp,"%c\n",(char)tailleX);
     fprintf(ftp,"%c\n",(char)tailleY);
     fprintf(ftp,"%c\n",(char)pvA);
@@ -511,6 +539,7 @@ int main()
     int chercheJ2[5] = {0};
     int nb_joueur = 1;
     int partie = 0;
+    int difficulte = 0;
     char c;
     int i = 0;
     int j = 0;
@@ -536,6 +565,18 @@ int main()
         }
         while (nb_joueur != 0 && nb_joueur != 1);
 
+        printf("\n");
+
+        do
+        {
+            printf("choisir difficulte\nmousse [0]\ncapitaine [1]\n");
+            scanf("%d", &difficulte);
+            fflush(stdin);
+        }
+        while (difficulte != 0 && difficulte != 1);
+
+        printf("\n");
+
         do
         {
             printf("choisir taille verticale (entre 6 et 99): ");
@@ -557,6 +598,10 @@ int main()
     {
         FILE* fptr = fopen("./sauvegarde.txt","r");
 
+
+        c = fgetc(fptr);
+        difficulte = (int)c;
+        c = fgetc(fptr);
         c = fgetc(fptr);
         tailleX = (int)c;
         c = fgetc(fptr);
@@ -603,7 +648,7 @@ int main()
         return(-1);
         }
 
-        for(i = 0; i < 8; i++)
+        for(i = 0; i < 10; i++)
         {
             c = fgetc(fptr);
         }
@@ -641,7 +686,17 @@ int main()
         if (nb_joueur == 0)
         {
             printf("J1 attaque J2\n");
-            attaque(chercheJ1, &pvJ2, tailleX, tailleY, mapJ1, mapJ2);
+
+            if (difficulte == 0)
+            {
+                attaque_facile(&pvJ2, tailleX, tailleY, mapJ1, mapJ2);
+            }
+            else
+            {
+                attaque(chercheJ1, &pvJ2, tailleX, tailleY, mapJ1, mapJ2);
+            }
+
+
             printf("pv restant a J2\n");
         }
         else
@@ -653,11 +708,20 @@ int main()
 
         printf("\n");
         printf("J2 attaque J1\n");
-        attaque(chercheJ2, &pvJ1, tailleX, tailleY, mapJ2, mapJ1);
+
+        if (difficulte == 0)
+            {
+                attaque_facile(&pvJ1, tailleX, tailleY, mapJ2, mapJ1);
+            }
+            else
+            {
+                attaque(chercheJ2, &pvJ1, tailleX, tailleY, mapJ2, mapJ1);
+            }
+
         printf("pv restant a J1\n");
         printf("\n");
 
-        FilerWrite(tailleX, tailleY, pvJ1, pvJ2, mapJ1, mapJ2);
+        FilerWrite(difficulte, tailleX, tailleY, pvJ1, pvJ2, mapJ1, mapJ2);
     }
     while(pvJ1 > 0 && pvJ2 > 0);
 
